@@ -7,6 +7,7 @@ Repacker for TERA datacenter
 - Python3 x64
 - *Bit* of free RAM: about 4GB+
 - `pycrypto` or `pycryptodome` for encryption
+- `lxml` for xmls 
 
 ### What works currently
 
