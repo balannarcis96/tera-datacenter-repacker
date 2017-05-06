@@ -12,7 +12,8 @@ Repacker for TERA datacenter
 
 - Packing / Unpacking of datacenter
 - Parsing datacenter to memory
-- Writing parsed datacenter from memory to file 
+- Writing parsed datacenter from memory to packed file 
+- Writing datacenter to xml
 
 ### What DOESN'T work (and should)
 

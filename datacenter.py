@@ -108,16 +108,6 @@ def readstr(str, start):
     return str[start:stop]
 
 
-packed = "D:\Games\TERA\Client\S1Game\S1Data\DataCenter_Final_EUR.dat.bck"
-
-key = bytes(bytearray.fromhex("033BC669EC0C9136DEE66D616CA75712"))
-iv = bytes(bytearray.fromhex("25B55107792BD1018E9567086CDA5965"))
-
-data = open(packed, "rb").read()
-
-unpacked = unpack(data, key, iv)
-print()
-# packed = pack(unpacked, key, iv)
 def Address(target):
     class AddressGeneric:
         __slots__ = ("upper", "lower", "target")
@@ -246,6 +236,12 @@ def Element(AttributeAddr, ElementAddr):
         def __pack__(self, stream):
             stream.pack("<HHHH", self.name_index, self.unk1, self.attribute_count, self.child_count)
             stream.pack(self.attributes, self.children)
+
+        def get_children(self):
+            yield from self.children.getrange(self.child_count)
+        
+        def get_attributes(self):
+            yield from self.attributes.getrange(self.attribute_count)
 
     return ElementGeneric
 
@@ -416,53 +412,11 @@ class Datacenter:
         stream.pack(self.footer)
         print("Done!")
 
+    def get_root(self):
+        return self.elements[0][0]
 
-stream = StructStream(unpacked)
-data = Datacenter()
+    def get_name(self, obj):
+        return self.name_index[obj.name_index].getstr()
 
-stream.unpack(data)
-
-print(stream.read())
-
-map = collections.defaultdict(set)
-
-x = 0
-for reg in data.attributes:
-    for attr in reg:
-        if attr.typecode in [1, 2, 5]:
-            continue
-
-        map[attr.typecode] |= {attr.value.getstr()}
-
-        # print(attr.typecode, repr(attr.value.getstr()), len(attr.value.getstr()), attr.value)
-
-        # x+=1
-        # if x %20 == 0:
-        #     input()
-
-out = open("out.txt", "wb")
-for key, list in sorted(map.items()):
-    out.write((str(key) + ": " + str(list) + "\n").encode())
-
-element = data.elements[0][0]
-name = data.name_index[element.name_index].getstr()
-
-print(name, element.unk1, element.child_count, element.attribute_count)
-
-res = open("out2.txt", "wb")
-
-for child in element.children.getrange(element.child_count):
-    name = data.name_index[child.name_index].getstr()
-
-    res.write("{}\n".format(name).encode())
-    # print(name, element.unk1)
-
-
-edited = StructStream(b"")
-edited.pack(data)
-
-
-
-packed = pack(edited.getvalue(), key, iv)
-open("D:\Games\TERA\Client\S1Game\S1Data\DataCenter_Final_EUR.dat", "wb").write(packed)
-
+    # def get_string(self, i):
+    #     return self.string_index[i].getstr()
