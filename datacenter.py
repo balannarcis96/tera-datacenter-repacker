@@ -7,7 +7,6 @@ import binascii
 import io
 import collections
 
-
 def sha1(text):
     s = SHA256.new()
     s.update(text)
